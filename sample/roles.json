@@ -1,0 +1,18 @@
+{
+  "budget": 2,
+  "bad_replica_code": "E_BAD_REPLICA",
+  "bad_point_code": "E_BAD_POINT",
+  "stale_code": "E_STALE_POINT",
+  "has_primary_code": "E_HAS_PRIMARY",
+  "no_primary_code": "E_NO_PRIMARY",
+  "no_replica_code": "E_NO_REPLICA",
+  "event_error_code": "E_BAD_EVENT",
+  "state": { "primary": "", "points": [], "switches": [], "ledger": [], "applied": [] },
+  "events": [
+    { "id": 1, "kind": "sync", "replica": "a", "upto": 5 },
+    { "id": 2, "kind": "sync", "replica": "b", "upto": 8 },
+    { "id": 3, "kind": "lead", "replica": "b" },
+    { "id": 4, "kind": "fail" },
+    { "id": 5, "kind": "lead", "replica": "a" }
+  ]
+}

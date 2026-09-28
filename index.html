@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><title>rolefail · 终端</title>
+<style>
+:root{--accent:#2f6fed;--soft:#dbe6ff}
+body{margin:0;background:#05070a;color:#c8f7d4;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+header{padding:16px 20px 8px;border-bottom:1px dashed #1d3a2a}
+h1{font-size:16px;margin:0 0 4px;color:#7dffb0}
+.hint{color:#6f9c81;font-size:12px;margin:0}
+#controls{display:flex;flex-wrap:wrap;gap:8px;padding:12px 20px;border-bottom:1px dashed #1d3a2a}
+#controls button{font:inherit;font-size:12px;padding:6px 10px;border-radius:4px;border:1px solid #2c5c40;background:#0a1410;color:#9ff5c4;cursor:pointer}
+#controls button.primary{background:var(--accent);border-color:var(--accent);color:#04120a;font-weight:600}
+#controls input{font:inherit;font-size:12px;padding:6px 8px;border-radius:4px;border:1px solid #2c5c40;background:#0a1410;color:#c8f7d4;width:120px}
+#controls label{font-size:12px;color:#6f9c81;align-self:center}
+#stage{padding:14px 20px;min-height:280px}
+#stage .row{display:flex;align-items:center;gap:8px;padding:3px 0}
+#stage .chip{border:1px solid #2c5c40;border-radius:4px;padding:1px 7px;font-size:12px;color:#9ff5c4}
+#stage .chip.ok{border-color:var(--accent);color:var(--accent)}
+#stage .chip.bad{border-color:#c2413a;color:#ff9a92}
+#stage .bar{height:14px;flex:1;border:1px solid #2c5c40;position:relative}
+#stage .bar i{position:absolute;inset:0 auto 0 0;background:var(--accent);opacity:.7}
+#stage .card{border:1px dashed #2c5c40;padding:8px 10px;margin-bottom:6px;font-size:12px}
+#legend{padding:0 20px 8px;color:#6f9c81;font-size:12px}
+pre#out{margin:10px 20px;background:#020503;border:1px solid #1d3a2a;border-radius:6px;padding:12px;font-size:12px;color:#9ff5c4;overflow:auto}
+#log{padding:0 20px 10px;color:#6f9c81;font-size:12px}
+details{padding:0 20px 30px;color:#6f9c81;font-size:12px}
+textarea{width:100%;height:120px;background:#020503;color:#c8f7d4;border:1px solid #1d3a2a;border-radius:6px;font-family:inherit;font-size:12px;padding:10px}
+#reload{font:inherit;margin-top:8px;padding:6px 12px;border-radius:4px;border:1px solid #2c5c40;background:#0a1410;color:#9ff5c4;cursor:pointer}
+</style></head>
+<body>
+<header><h1>rolefail · 终端</h1><p class="hint">点按钮改处理预算、减事件，右边看谁在主机位、各副本同步到哪、每次换手记了什么。</p></header>
+<section id="controls"></section>
+<section id="stage"></section>
+<div id="legend"></div>
+<pre id="out">还没跑</pre>
+<div id="log"></div>
+
+<details>
+  <summary>场景数据（可以直接改，改完点重新载入）</summary>
+  <textarea id="input">{
+  "budget": 2,
+  "bad_replica_code": "E_BAD_REPLICA",
+  "bad_point_code": "E_BAD_POINT",
+  "stale_code": "E_STALE_POINT",
+  "has_primary_code": "E_HAS_PRIMARY",
+  "no_primary_code": "E_NO_PRIMARY",
+  "no_replica_code": "E_NO_REPLICA",
+  "event_error_code": "E_BAD_EVENT",
+  "state": { "primary": "", "points": [], "switches": [], "ledger": [], "applied": [] },
+  "events": [
+    { "id": 1, "kind": "sync", "replica": "a", "upto": 5 },
+    { "id": 2, "kind": "sync", "replica": "b", "upto": 8 },
+    { "id": 3, "kind": "lead", "replica": "b" },
+    { "id": 4, "kind": "fail" },
+    { "id": 5, "kind": "lead", "replica": "a" }
+  ]
+}</textarea>
+  <button id="reload">重新载入场景</button>
+</details>
+<script type="module">
+import { mount } from "./ui.js";
+
+const parts = {
+  controls: document.getElementById("controls"),
+  stage: document.getElementById("stage"),
+  out: document.getElementById("out"),
+  legend: document.getElementById("legend"),
+  log: document.getElementById("log")
+};
+
+function start(spec) {
+  try {
+    mount(spec, parts);
+  } catch (error) {
+    parts.out.textContent = String(error && error.stack ? error.stack : error);
+  }
+}
+
+document.getElementById("reload").addEventListener("click", function () {
+  try {
+    start(JSON.parse(document.getElementById("input").value));
+  } catch (error) {
+    parts.out.textContent = String(error);
+  }
+});
+
+start(JSON.parse(document.getElementById("input").value));
+</script>
+</body></html>
